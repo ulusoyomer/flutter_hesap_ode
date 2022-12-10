@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hesap_ode/result.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 class PayBill extends StatefulWidget {
   const PayBill({super.key});
@@ -8,6 +10,10 @@ class PayBill extends StatefulWidget {
 }
 
 class _PayBillState extends State<PayBill> {
+  double friends = 1;
+  double tips = 0;
+  String bill = "";
+
   TextStyle fontMontserrat(
       {double fontSize = 18,
       Color color = const Color.fromRGBO(234, 234, 234, 1),
@@ -23,7 +29,17 @@ class _PayBillState extends State<PayBill> {
     return Expanded(
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(padding: const EdgeInsets.all(20)),
-        onPressed: () {},
+        onPressed: () {
+          setState(() {
+            if (text == "-") {
+              bill = "";
+              friends = 1;
+              tips = 0;
+            } else {
+              if (bill.length < 8) bill += text;
+            }
+          });
+        },
         child: Text(
           text,
           style: fontMontserrat(color: const Color.fromRGBO(255, 46, 99, 1)),
@@ -34,20 +50,9 @@ class _PayBillState extends State<PayBill> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    if (screenHeight > 670.0) {
-      return Scaffold(
-        body: Container(
-          margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: mainLayout(context),
-          ),
-        ),
-      );
-    } else {
-      return Scaffold(
-        body: SingleChildScrollView(
+    return Scaffold(
+      body: Center(
+        child: SingleChildScrollView(
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
@@ -55,8 +60,8 @@ class _PayBillState extends State<PayBill> {
             ),
           ),
         ),
-      );
-    }
+      ),
+    );
   }
 
   List<Widget> mainLayout(BuildContext context) {
@@ -86,21 +91,22 @@ class _PayBillState extends State<PayBill> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Padding(
-              padding: const EdgeInsets.all(15),
+              padding: EdgeInsets.only(
+                  top: 15, left: (MediaQuery.of(context).size.width - 40) / 50),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
                     "Toplam Fiyat",
                     style: fontMontserrat(
-                      fontSize: 20,
+                      fontSize: (MediaQuery.of(context).size.width - 40) / 20,
                       color: const Color.fromRGBO(255, 46, 99, 1),
                     ),
                   ),
                   Text(
-                    "34₺",
+                    "$bill₺",
                     style: fontMontserrat(
-                      fontSize: 25,
+                      fontSize: (MediaQuery.of(context).size.width - 40) / 15,
                       color: const Color.fromRGBO(255, 46, 99, 1),
                     ),
                   ),
@@ -109,7 +115,7 @@ class _PayBillState extends State<PayBill> {
             ),
             Padding(
               padding: EdgeInsets.only(
-                  right: MediaQuery.of(context).size.width / 40, top: 15),
+                  right: MediaQuery.of(context).size.width / 50, top: 15),
               child: Row(
                 children: [
                   Column(
@@ -117,11 +123,15 @@ class _PayBillState extends State<PayBill> {
                     children: [
                       Text(
                         "Kişi Sayısı",
-                        style: fontMontserrat(),
+                        style: fontMontserrat(
+                            fontSize:
+                                (MediaQuery.of(context).size.width - 40) / 20),
                       ),
                       Text(
                         "Bahşiş",
-                        style: fontMontserrat(),
+                        style: fontMontserrat(
+                            fontSize:
+                                (MediaQuery.of(context).size.width - 40) / 20),
                       ),
                     ],
                   ),
@@ -132,12 +142,16 @@ class _PayBillState extends State<PayBill> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "5",
-                        style: fontMontserrat(),
+                        friends.round().toString(),
+                        style: fontMontserrat(
+                            fontSize:
+                                (MediaQuery.of(context).size.width - 40) / 20),
                       ),
                       Text(
-                        "10₺",
-                        style: fontMontserrat(),
+                        "$tips₺",
+                        style: fontMontserrat(
+                            fontSize:
+                                (MediaQuery.of(context).size.width - 40) / 20),
                       ),
                     ],
                   ),
@@ -155,21 +169,26 @@ class _PayBillState extends State<PayBill> {
         style: fontMontserrat(fontSize: 20, color: Colors.black),
       ),
       Slider(
-        min: 0,
+        min: 1,
         max: 15,
-        divisions: 15,
+        divisions: 14,
         activeColor: const Color.fromRGBO(8, 217, 214, 1),
         inactiveColor: Colors.grey,
-        value: 12,
-        onChanged: ((value) {}),
+        value: friends,
+        onChanged: ((value) {
+          setState(() {
+            friends = value;
+          });
+        }),
       ),
       const SizedBox(
         height: 10,
       ),
       Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: (MediaQuery.of(context).size.width - 40.0) / 2,
+            width: MediaQuery.of(context).size.width / 1.5,
             height: 70,
             decoration: const BoxDecoration(
               color: Color.fromRGBO(37, 42, 52, 1),
@@ -190,7 +209,14 @@ class _PayBillState extends State<PayBill> {
                       width: 40,
                       height: 40,
                       child: FloatingActionButton(
-                        onPressed: () {},
+                        heroTag: "btnDecrease",
+                        onPressed: () {
+                          setState(() {
+                            if (tips >= 5) {
+                              tips -= 5.0;
+                            }
+                          });
+                        },
                         backgroundColor: const Color.fromRGBO(234, 234, 234, 1),
                         child: const Icon(
                           Icons.remove,
@@ -199,7 +225,7 @@ class _PayBillState extends State<PayBill> {
                       ),
                     ),
                     Text(
-                      "20",
+                      "$tips₺",
                       style: fontMontserrat(
                         fontSize: 27,
                       ),
@@ -208,7 +234,12 @@ class _PayBillState extends State<PayBill> {
                       width: 40,
                       height: 40,
                       child: FloatingActionButton(
-                        onPressed: () {},
+                        heroTag: "btnIncrease",
+                        onPressed: () {
+                          setState(() {
+                            tips += 5;
+                          });
+                        },
                         backgroundColor: const Color.fromRGBO(234, 234, 234, 1),
                         child: const Icon(
                           Icons.add,
@@ -219,33 +250,6 @@ class _PayBillState extends State<PayBill> {
                   ],
                 )
               ],
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Container(
-            width: (MediaQuery.of(context).size.width - 60.0) / 2,
-            height: 70,
-            decoration: const BoxDecoration(
-              color: Color.fromRGBO(37, 42, 52, 1),
-              borderRadius: BorderRadius.all(Radius.circular(15)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(7.0),
-              child: TextField(
-                onChanged: (value) {},
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
-                    ),
-                  ),
-                  labelText: "Kişi",
-                  labelStyle: fontMontserrat(fontSize: 15),
-                ),
-              ),
             ),
           ),
         ],
@@ -283,8 +287,22 @@ class _PayBillState extends State<PayBill> {
       ),
       TextButton(
         style: TextButton.styleFrom(
-            backgroundColor: const Color.fromRGBO(255, 46, 99, 1)),
-        onPressed: () {},
+          backgroundColor: const Color.fromRGBO(255, 46, 99, 1),
+        ),
+        onPressed: () {
+          double? totalBill = double.tryParse(bill.replaceAll(',', '.'));
+          if (totalBill != null) {
+            if (totalBill > 0) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: ((context) => ResultPage(
+                          bill: bill, friends: friends, tips: tips))));
+            }
+          } else {
+            showToast("Hesap tutarını giriniz!", context: context);
+          }
+        },
         child: Center(
           child: Text(
             'Hesabı Böl',
